@@ -7,9 +7,7 @@ const app = Fastfy()
 app.register(cors, {})
 app.register(appRoutes)
 
-app.get('/', (req, reply) => {
-  reply.send({ hello: 'world' })
-})
+
 
 app.listen({
     port:3333,

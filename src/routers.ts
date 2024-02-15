@@ -5,7 +5,9 @@ import {z} from 'zod'
 
 
 export async function appRoutes(app: FastifyInstance){
-
+    app.get('/', (req, reply) => {
+        reply.send({ hello: 'world' })
+      })
     app.post('/habits', async (request) => {
 
         const createHabitBody = z.object({
