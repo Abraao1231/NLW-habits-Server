@@ -15,8 +15,10 @@
   "license": "ISC",
   "dependencies": {
     "@fastify/cors": "^9.0.1",
-    "@prisma/client": "^5.9.1",
+    "@prisma/client": "^5.10.2",
+    "config": "^3.3.11",
     "dayjs": "^1.11.10",
+    "dotenv": "^16.4.5",
     "fastify": "^4.26.0",
     "tsup": "^8.0.2",
     "tsx": "^4.7.0",
@@ -25,7 +27,7 @@
   },
   "devDependencies": {
     "@mermaid-js/mermaid-cli": "^10.7.0",
-    "prisma": "^5.9.1",
+    "prisma": "^5.10.2",
     "prisma-erd-generator": "^1.11.2"
   },
   "prisma": {
