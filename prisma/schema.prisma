@@ -49,6 +49,18 @@ model DayHabit {
   @@map("day_habit")
 }
 
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  email      String
+  password   String
+  created_at DateTime
+
+  @@unique([id, email])
+  @@map("user")
+}
+
+
 model HabitWeekDays {
   id       String @id @default(uuid())
   habit_id String

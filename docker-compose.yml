@@ -8,11 +8,13 @@ services:
     depends_on:
       - postgres
     container_name: server
+    restart: unless-stopped
+    working_dir: /app
     env_file: .env
     ports:
       - "${PORT}:${PORT}"
     volumes:
-      - .:/home/node/app
+      - .:/app
 
   postgres:
     image: postgres:latest

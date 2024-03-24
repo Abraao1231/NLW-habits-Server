@@ -8,6 +8,6 @@ RUN npm install
 
 COPY . . 
 
-# RUN npx run migrate dev --name init
+EXPOSE 3333
 
 CMD [ "npm", "run", "dev" ]

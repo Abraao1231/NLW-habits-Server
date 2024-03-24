@@ -1,12 +1,20 @@
 import Fastfy from 'fastify'
 import cors from '@fastify/cors'
 import { appRoutes } from './routers'
+import { authRouters } from './routersAuth'
+import fastifyJwt from '@fastify/jwt'
+
 
 
 const app = Fastfy()
 app.register(cors, {})
 app.register(appRoutes)
-
+app.register(authRouters, {
+    prefix: '/auth'
+})
+app.register(fastifyJwt, {
+    secret: process.env.JWT_SECRET
+})
 
 
 app.listen({
