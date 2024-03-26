@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
@@ -15,12 +15,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  email      String
+  password   String
+  created_at DateTime
+  habit      habit[]
+
+  @@unique([id, email])
+  @@map("user")
+}
+
 model habit {
-  id            String          @id @default(uuid())
-  title         String
-  created_at    DateTime
-  DayHabits     DayHabit[]
-  WeekDays HabitWeekDays[]
+  id         String          @id @default(uuid())
+  title      String
+  created_at DateTime
+  user_id    String
+
+  DayHabits  DayHabit[]
+  WeekDays   HabitWeekDays[]
+
+  user User @relation(fields: [user_id], references: [id])
 
   @@map("habits")
 }
@@ -44,29 +60,16 @@ model DayHabit {
   day   Day   @relation(fields: [day_id], references: [id])
   habit habit @relation(fields: [habit_id], references: [id])
 
-
   @@unique([day_id, habit_id])
   @@map("day_habit")
 }
-
-model User {
-  id         String   @id @default(uuid())
-  name       String
-  email      String
-  password   String
-  created_at DateTime
-
-  @@unique([id, email])
-  @@map("user")
-}
-
 
 model HabitWeekDays {
   id       String @id @default(uuid())
   habit_id String
   week_day Int
 
-  habit   habit  @relation(fields: [habit_id], references: [id])
+  habit habit @relation(fields: [habit_id], references: [id])
 
   @@unique([habit_id, week_day])
   @@map("habit_week_days")

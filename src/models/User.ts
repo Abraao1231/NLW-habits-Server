@@ -4,18 +4,24 @@ import bcrypt from 'bcryptjs';
 
 
 
-export interface UserProps {
+export interface UserPropsRequest {
     name: string
     email: string
     password: string
 }
 
-
+export interface UserProps {
+    name: string
+    email: string
+    password: string
+    id: string
+    created_at: Date
+}
 
 export class User {
     constructor (){}
 
-    async createUser(user: UserProps){
+    async createUser(user: UserPropsRequest){
         try {
            
 
@@ -49,11 +55,21 @@ export class User {
     }
 
     async validadeExistsUser(email: string){
-        const user = await prisma.user.findFirst({
+        let user: UserProps;
+        const userFind = await prisma.user.findFirst({
             where: {
                 email: email
             }
         })   
+        if (userFind != null)
+             user = {
+                name: userFind.name, 
+                email: userFind.email,
+                password: userFind.password,
+                created_at: new Date(userFind.created_at),
+                id: userFind.id
+            }
+        
         return user         
     }
 

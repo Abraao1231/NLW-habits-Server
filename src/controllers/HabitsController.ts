@@ -1,142 +1,36 @@
-import { z } from 'zod'
-import dayjs from 'dayjs'
-import { prisma } from '../lib/prisma'
+import { User } from '../models/User'
+import { Summary } from '../models/Summary'
+import { Day } from '../models/Day'
+import { Habit } from '../models/Habit'
 
     
-    export async function createHabits(request: any) {
-        const createHabitBody = z.object({
-            title: z.string(),
-            WeekDays: z.array(z.number().min(0).max(6))
-        })
+export async function createHabits(request: any, email: string) {
+    
+    const habit = new Habit()
+    const user = new User()
+    const userId = await user.validadeExistsUser(email)
+    await habit.createHabit(request, userId.id);
+}
 
-        const { title, WeekDays } = createHabitBody.parse(request.body)
-        const today = dayjs().startOf('day').toDate()
+export async function getDay(request: any, email:string){
+    const day = new Day()
+    const user = new User()
+    const userId = await user.validadeExistsUser(email)
+    return day.getDay(request, userId.id)
+}
 
-        await prisma.habit.create({
-            data: {
-                title,
-                created_at: today,
-                WeekDays: {
-                    create: WeekDays.map(weekDay => {
-                        return { week_day: weekDay, }
-                    })
-                },
-            }
-        })
-    }
+export async function toggleHabit(request: any, email: string) {
+    const habit = new Habit()
+    const user = new User()
+    const userId = await user.validadeExistsUser(email)
 
-    export async function getDay(request: any) {
-        try {
-            const getDayParams = z.object({
-                date: z.coerce.date()
-            })
-            const { date } = getDayParams.parse(request.query)
-            const parsedDate = dayjs(date).startOf('day')
-            const weekDay = parsedDate.get('day')
+    await habit.toggleHabit(request, userId.id);
+}
 
-            const possibleHabits = await prisma.habit.findMany({
-                where: {
-                    created_at: {
-                        lte: date
-                    },
-                    WeekDays: {
-                        some: {
-                            week_day: weekDay
-                        }
-                    }
-                }
-            })
-
-            const day = await prisma.day.findUnique({
-                where: {
-                    date: parsedDate.toDate()
-                },
-                include: {
-                    dayHabits: true
-                }
-            })
-
-            const completedHabits = day?.dayHabits.map(habits => {
-                return habits.habit_id
-            }) ?? []
-
-            return {
-                possibleHabits,
-                completedHabits
-            }
-        } catch (error) {
-            console.log(error);
-
-        }
-    }
-
-    export async function toggleHabit(request: any) {
-        const toggleHabitParams = z.object({
-            id: z.string().uuid()
-        })
-
-        const { id } = toggleHabitParams.parse(request.params)
-        const today = dayjs().startOf('day').toDate()
-
-        let day = await prisma.day.findUnique({
-            where: {
-                date: today
-            }
-        })
-        if (!day) {
-            day = await prisma.day.create({
-                data: {
-                    date: today
-                }
-            })
-        }
-
-        const dayHabit = await prisma.dayHabit.findUnique({
-            where: {
-                day_id_habit_id: {
-                    day_id: day.id,
-                    habit_id: id
-                }
-            }
-        })
-
-        if (dayHabit) {
-            await prisma.dayHabit.delete({
-                where: {
-                    id: dayHabit.id,
-                }
-            })
-        } else {
-            // completar habito
-
-            await prisma.dayHabit.create({
-                data: {
-                    day_id: day.id,
-                    habit_id: id
-                }
-            })
-        }
-
-    }
-
-    export async function getSummary(){
-        const summary = await prisma.$queryRaw`
-            SELECT D.id, 
-        D.date,
-            (
-            SELECT cast(count(*) as float)
-            FROM day_habit DH
-            WHERE DH.day_id = D.id
-        ) as completed,
-        (
-            SELECT cast(count(*) as float)
-            FROM habit_week_days HDW
-            JOIN habits H ON H.id = HDW.habit_id
-            WHERE
-            HDW.week_day = EXTRACT(dow FROM D.date AT TIME ZONE 'utc')
-            AND H.created_at <= D.date
-        ) as amount
-            FROM day D;
-            `
-            return summary
-    }
+export async function getSummary(email: string){
+    const user = new User()
+    const SummaryModel = new Summary()
+    const userId = await user.validadeExistsUser(email)
+    const data = await SummaryModel.getData(userId.id);
+    return  data;
+}

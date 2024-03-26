@@ -1,6 +1,6 @@
 import { User } from "../models/User" 
 import { z } from 'zod'
-import { UserProps } from "../models/User"
+import { UserPropsRequest } from "../models/User"
 
 export async function createUser( request: any ) {
     const userModel = new User()
@@ -12,7 +12,7 @@ export async function createUser( request: any ) {
     })    
     const {name, email, password} = createUserBody.parse(request.body)
 
-    const user: UserProps = {
+    const user: UserPropsRequest = {
         name: name,
         password: password,
         email:email
