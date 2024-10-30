@@ -31,7 +31,7 @@ export class User {
 
             
             if (userFind == null){
-                await prisma.user.create({
+                const createdUser = await prisma.user.create({
                     data: {
                         name: user.name,
                         email: user.email,
@@ -39,14 +39,12 @@ export class User {
                         created_at: created_at
                     }
                 })
-                return {status: 200, message: 'usuario cadastrado com sucesso'}
+                return {status: 200, message: 'usuario cadastrado com sucesso', user: createdUser}
             } else {
-                return {status: 400, message: `e-mail ja cadastrado`}
+                return {status: 400, message: `E-mail ja cadastrado`}
             }
 
         } catch (error) {
-            console.log(error);   
-            console.log(user.password);
     
             return {status: 500, message: `erro interno no servidor ` }
 

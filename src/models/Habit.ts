@@ -35,7 +35,7 @@ export class Habit {
 
         const { id } = toggleHabitParams.parse(request.params)
         const today = dayjs().startOf('day').toDate()
-
+        
         let day = await prisma.day.findUnique({
             where: {
                 date: today

@@ -7,13 +7,14 @@ services:
     depends_on:
       - postgres
     container_name: server
-    restart: unless-stopped
     working_dir: /app
     env_file: .env
     ports:
       - "${PORT}:${PORT}"
     volumes:
       - .:/app
+    environment:
+      - TZ=America/Sao_Paulo  # Adicione a variável de timezone
 
   postgres:
     image: postgres:latest
@@ -24,9 +25,9 @@ services:
       - progresDB:/data/postgres
     env_file:
       - ./.env
-
+    environment:
+      - TZ=America/Sao_Paulo  # Adicione a variável de timezone
  
 volumes:
   progresDB:
   redisDB:
-

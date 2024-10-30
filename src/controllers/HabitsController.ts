@@ -32,5 +32,6 @@ export async function getSummary(email: string){
     const SummaryModel = new Summary()
     const userId = await user.validadeExistsUser(email)
     const data = await SummaryModel.getData(userId.id);
-    return  data;
+    const chart = await SummaryModel.getChartSummary(data)
+    return  { summary:data, chart: chart};
 }

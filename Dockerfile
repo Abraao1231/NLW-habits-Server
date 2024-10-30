@@ -6,8 +6,9 @@ COPY package.json .
 
 RUN npm install 
 
-COPY . . 
+COPY . .
 
+ 
 EXPOSE 3333
 EXPOSE 5555
 

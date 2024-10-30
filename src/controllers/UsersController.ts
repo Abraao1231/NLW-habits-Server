@@ -16,9 +16,10 @@ export async function createUser( request: any ) {
         name: name,
         password: password,
         email:email
-    }
+    }   
 
-    const response = userModel.createUser(user)
-    return response
+        return await userModel.createUser(user)
+
+     
 } 
 

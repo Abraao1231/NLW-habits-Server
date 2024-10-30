@@ -18,6 +18,9 @@ export async function appRoutes(app: FastifyInstance) {
       }
         
     })
+    app.get('/', async (request, response) => {
+        response.send({message:'asd'})
+    })
     app.get('/day', {onRequest: [authenticateHandler]}, async (request, response) => {
       try {
         const decodedToken = app.jwt.decode(request.headers.authorization.replace('Bearer ', ''));
@@ -59,7 +62,6 @@ export async function appRoutes(app: FastifyInstance) {
       
       // return getSummary(email)
     })
-
     app.post('/user', {
         schema: {
             body: {
@@ -74,7 +76,20 @@ export async function appRoutes(app: FastifyInstance) {
           },
           
           handler: async (request, reply) => {
-            return createUser(request)
+            const response = await createUser(request)
+            
+            reply.status(response.status)
+            if (response.status == 200){
+              const token = app.jwt.sign(response.user,{
+                expiresIn: '2d'
+              })
+              return {
+                user: response.user,
+                token: token 
+              }
+            } 
+            
+            reply.send({message: response.message})
           },
     })
     

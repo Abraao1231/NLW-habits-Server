@@ -26,7 +26,7 @@ export async function authRouters(app: FastifyInstance) {
                 const token = app.jwt.sign(userFind,{
                   expiresIn: '2d'
                 })
-                res.send({message: "login successfully", token: token})
+                res.send({message: "login successfully", token: token, user: userFind})
             }
           },
     })

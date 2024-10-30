@@ -1,7 +1,7 @@
-import dayjs from "dayjs"
+import dayjs from "dayjs";
 import { prisma } from "../lib/prisma";
 import { z } from "zod";
-import { User } from "./User";
+
 
 export class Day {
     
@@ -10,9 +10,11 @@ export class Day {
             const getDayParams = z.object({
                 date: z.coerce.date()
             })
+            
             const { date } = getDayParams.parse(request.query)
+
             const parsedDate = dayjs(date).startOf('day')
-            const weekDay = parsedDate.get('day')
+            const weekDay = parsedDate.day()
             
             const possibleHabits = await prisma.habit.findMany({
                 where: {
@@ -29,29 +31,29 @@ export class Day {
                     }
                 }
             })
-
-            const day = await prisma.day.findUnique({
+            const day2 = await prisma.day.findUnique({
                 where: {
                     date: parsedDate.toDate(),
-                    dayHabits: {
-                        every: {
-                           habit: {
-                             user_id: userId
-                           } 
-                        }
-                    } 
-                },
-                
-                include: {
-                    dayHabits: true
-                }
+                  }
+            })   
+    
+            const dayHabit = await prisma.dayHabit.findMany({
+                where:{
+                    day_id: day2.id,
+                    habit: {
+                        user_id: userId
+                    }
+                    
+                } 
             })
 
-            const completedHabits = day?.dayHabits.map(habits => {
+           
+            
+            const completedHabits = dayHabit.map(habits => {
                 return habits.habit_id
             }) ?? []
        
-
+            
             return {
                 possibleHabits,
                 completedHabits
